@@ -1,0 +1,10 @@
+#!/usr/bin/env ruby
+
+require 'psql-cm'
+require 'psql-cm/cli'
+
+::PSQLCM::CLI.parse!(ARGV)
+
+::PSQLCM.run!(ARGV.shift)
+
+

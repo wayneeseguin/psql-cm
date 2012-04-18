@@ -1,0 +1,9 @@
+.idea/
+.DS_Store
+*.log
+config/appfirst.yml
+config/database.yml
+*.gem
+.rbx
+.idea/
+sql/
