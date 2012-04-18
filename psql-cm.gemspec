@@ -20,7 +20,7 @@ Gem::Specification.new do |spec|
 
   spec.require_path = 'lib'
   spec.executables  = ['psql-cm']
-  spec.files        = Dir.glob('{bin,lib}/**/*') + %w(LICENCE README.md)
+  spec.files        = Dir.glob('{bin,lib}/**/*') + %w(LICENCE README.md History.md)
   spec.test_files   = Dir.glob('spec/**/*')
 end
 
