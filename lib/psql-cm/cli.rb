@@ -10,7 +10,7 @@ module PSQLCM
           options.separator ""
           options.separator "Specific options:"
 
-          options.on("-s", "--sql-path PATH", "Path to generate SQL cm files.") do |path|
+          options.on("-s", "--sql-path PATH", "Path to dump SQL cm files into.") do |path|
             ::PSQLCM.config.sql_path = path
           end
 
@@ -19,7 +19,7 @@ module PSQLCM
           end
 
           options.on("-u", "--uri URI", "Path to the sink database connection file.") do |uri|
-            ::PSQLCM.configure!(uri)
+            ::PSQLCM.config.uri = uri
           end
 
           options.on("-D", "--[no-]debug", "Output debugging information.") do |debug|

@@ -1,24 +1,45 @@
-require 'uri'
-
 module PSQLCM
-  # "postgres://{user}:{password}@{host}:{port}/{database}"
-  class << self
+  class Connection < Delegator
+    def initialize(options = {})
+      @name = options[:dbname] || 'postgres'
+      @config = ::PSQLCM.config.connection.merge(options)
+
+      super # For delegator pattern:
+      @delegated_object = db
+    end
+
+    # Delegator to PG::Connection
+    def __getobj__ ; @db end
+    def __setobj__(object) ;  end
+
     def db
-      return @db if @db
-      connect!
+      @db || connect!
     end
 
     def connect!
-      @config.connection ||= {"dbname" => "postgres"}
-      @db = PG.connect(@config.connection)
+      @db = PG.connect(@config)
     end
 
-    def reconnect!
-      @db.close
+    def reconnect!(name = @name)
+      close!
       connect!
     end
 
-    def configure!(uri)
+    def close!
+      @db.close
+    end
+  end # class Connection
+
+  class << self
+    def db(name = 'postgres')
+      @db ||= {}
+      return @db[name] if @db[name]
+      @config.connection || configure!
+      @db[name] = Connection.new(:dbname => name)
+    end
+
+    # "postgres://{user}:{password}@{host}:{port}/{database}"
+    def configure!
       uri = URI.parse(::PSQLCM.config.uri)
 
       query = uri.query.to_s.split('&')
@@ -37,5 +58,5 @@ module PSQLCM
       }.delete_if { |key, value| value.nil? }
     end
   end # class << self
-end # module PSQLCM
 
+end # module PSQLCM
