@@ -1,3 +1,7 @@
+# 0.0.4 - 2012-04-18
+
+'restore' action functional.
+
 # 0.0.3 - 2012-04-18
 
 'setup' action functional.
