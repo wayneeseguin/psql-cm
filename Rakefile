@@ -38,7 +38,7 @@ end
 task :release do
   require 'psql-cm/version'
 
-  %x{git tag -a #{::PSQLCM::Version}}
+  %x{git tag #{::PSQLCM::Version}}
   %x{git push origin --tags}
   %x{gem build psql-cm.gemspec}
   %x{gem push psql-cm-#{::PSQLCM::Version}.gem}
