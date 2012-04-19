@@ -119,9 +119,24 @@ Next we'll dump the schema to sql/ within our working directory
 
     $ psql-cm --databases psqlcm_test --uri "postgres://127.0.0.1:5432" dump
 
-At this point we have the base schema for the psqlcm\_test database recorded and
-we can test to see that this is true by droping the database and then running
-the psql-cm restore action.
+At this point we have the base schema for the psqlcm\_test database recorded to
+the filesystem. You can see the filesystem structure and contents with
+a find command on \*nix:
+
+    $ find sql/psqlcm_test
+    sql/psqlcm_test
+    sql/psqlcm_test/public
+    sql/psqlcm_test/public/base.sql
+    sql/psqlcm_test/public/cm.sql
+    sql/psqlcm_test/schema_one
+    sql/psqlcm_test/schema_one/base.sql
+    sql/psqlcm_test/schema_one/cm.sql
+    sql/psqlcm_test/schema_two
+    sql/psqlcm_test/schema_two/base.sql
+    sql/psqlcm_test/schema_two/cm.sql
+
+We can now do a restore restore by droping the database and then running the
+psql-cm restore action.
 
     $ dropdb psqlcm_test
     $ psql-cm --databases psqlcm_test --uri "postgres://127.0.0.1:5432" restore
