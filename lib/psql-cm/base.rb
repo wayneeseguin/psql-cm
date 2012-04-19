@@ -88,10 +88,9 @@ module PSQLCM
           end
         end
 
-        unless File.exists?('.git') && File.directory?('.git')
-          sh 'git', "git init ; git add ."
-          sh 'git', "git commit -a -m 'PostgreSQL Change Management (psql-cm).'"
-        end
+        sh 'git', "git init; git add ." unless File.exists?('.git') && File.directory?('.git')
+
+        sh 'git', "git commit -a -m 'PostgreSQL Change Management (psql-cm).\nDatabases: #{databases}\nTree: #{tree}'"
       end
     end # def dump!
 
