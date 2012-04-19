@@ -1,8 +1,10 @@
 module PSQLCM
+
   class Connection < Delegator
+
     def initialize(options = {})
-      @name = options[:dbname] || 'postgres'
       @config = ::PSQLCM.config.connection.merge(options)
+      @config[:dbname] = options[:dbname] || 'postgres'
 
       super # For delegator pattern:
       @delegated_object = db
@@ -13,6 +15,10 @@ module PSQLCM
     def __setobj__(object) ;  end
 
     def db
+      unless @config[:dbname] == 'postgres'
+        ::PSQLCM.sh 'createdb', "createdb #{psql_args} #{@config[:dbname]}"
+      end
+
       @db || connect!
     end
 
@@ -20,7 +26,7 @@ module PSQLCM
       @db = PG.connect(@config)
     end
 
-    def reconnect!(name = @name)
+    def reconnect!(name = @config[:dbname])
       close!
       connect!
     end
@@ -28,6 +34,28 @@ module PSQLCM
     def close!
       @db.close
     end
+
+    def pgpass # Ensure a pgpass entry exists for this connection.
+      pgpass_line = [
+        @config[:host], @config[:port], @config[:dbname], @config[:user],
+        @config[:password]
+      ].join(':')
+
+      content = File.open(File.join(ENV['HOME'], '.pgpass'), 'r') { |file| file.read }
+      unless content.lines.detect{ |line| line == pgpass_line }
+        File.open(File.join(ENV['HOME'], '.pgpass'), 'w') do |file|
+          file.write(content + pgpass_line + "\n")
+        end
+      end
+
+      pgpass_line
+    end # def pgpass
+
+    def psql_args
+      pgpass
+      "-h #{@config[:host]} -p #{@config[:port]} -U #{@config[:user]}"
+    end # def psql_args
+
   end # class Connection
 
   class << self
@@ -35,6 +63,7 @@ module PSQLCM
       @db ||= {}
       return @db[name] if @db[name]
       @config.connection || configure!
+
       @db[name] = Connection.new(:dbname => name)
     end
 
@@ -51,7 +80,7 @@ module PSQLCM
         :host => uri.host,
         :port => uri.port || 5432,
         :dbname => "postgres", # uri.path.sub('/',''),
-        :user => uri.user,
+        :user => uri.user || ENV['USER'],
         :password => uri.password,
         :connect_timeout => timeout.empty? ? 20 : timeout.to_i,
         :sslmode => sslmode.empty? ? "disable" : sslmode # (disable|allow|prefer|require)

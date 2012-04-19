@@ -32,7 +32,7 @@ module PSQLCM
 
     def schemas(name = 'postgres')
       @schemas = db(name).
-        exec("SELECT nspname as name FROM pg_namespace WHERE nspname !~ '^pg_.*|information_schema';").
+        exec("SELECT nspname AS name FROM pg_namespace WHERE nspname !~ '^pg_.*|information_schema';").
         map{|row| row["name"]}
       debug "schemas> #{@schemas}"
       @schemas
@@ -77,7 +77,7 @@ module PSQLCM
             FileUtils.touch(base_file)
             FileUtils.touch(cm_file)
 
-            command = "pg_dump --schema-only --no-owner --schema=#{schema} "
+            command = "pg_dump #{db(database).psql_args} --schema-only --no-owner --schema=#{schema} "
             if File.size(base_file) > 0
               command += "--file=#{cm_file}  --table=psql_cm "
             else
@@ -95,7 +95,6 @@ module PSQLCM
       debug "setup> Setting up pg_psql_cm table in each target schema."
       tree.each_pair do |database, schema_hash|
         schema_hash.keys.each do |schema|
-          debug "setup:#{database}> #{schema}"
           sql = <<-SQL
             SET search_path = #{schema}, public;
             CREATE TABLE IF NOT EXISTS #{schema}.pg_psql_cm
@@ -107,14 +106,48 @@ module PSQLCM
               content text NOT NULL
             );
           SQL
-
-          debug "setup: sql:\n#{sql}"
+          debug "setup:#{database}:#{schema}> sql\n#{sql}"
           db(database).exec sql
         end
       end
     end
 
     def restore!
+      unless config.sql_path
+        $stdout.puts "Warning: --sql-path was not set, defaulting to $PWD/sql."
+        config.sql_path = "#{ENV["PWD"]}/sql"
+      end
+
+      debug "restore> sql_path: #{config.sql_path}"
+      File.directory?(config.sql_path) or
+        halt! "Cannot restore from a path that does not exist: #{config.sql_path}"
+
+      Dir.chdir(config.sql_path) do
+
+        Dir['*'].each do |database|
+          next unless File.directory? database
+
+          Dir.chdir(database) do
+            sh "restore", "createdb #{db(database).psql_args} #{database}"
+
+            debug "restore:#{database}>"
+            Dir['*'].each do |schema|
+              next unless File.directory? schema
+
+              base_file = File.join(config.sql_path,database,schema,'base.sql')
+              cm_file = File.join(config.sql_path,database,schema,'cm.sql')
+
+              debug "restore:#{database}:#{schema}> #{base_file}"
+              sh 'restore', "psql #{db(database).psql_args} #{database} < #{base_file}"
+
+              next if File.size(cm_file) == 0
+
+              debug "restore:#{database}:#{schema}> #{cm_file}"
+              sh 'restore', "psql #{db(database).psql_args} #{database} < #{cm_file}"
+            end
+          end
+        end
+      end
     end
 
     def run!(action = config.action, parent_id = config.parent_id)
@@ -133,8 +166,6 @@ module PSQLCM
         halt! "Action '#{action}' is not handled."
       end
     end
-
-    private
 
     def sh(tag, command)
       debug "sh:#{tag}> #{command}"
