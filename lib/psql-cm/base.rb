@@ -152,6 +152,11 @@ module PSQLCM
           end
         end
       end
+    end # def restore!
+
+    def change!
+      puts "TODO: allow change string and/or file to be specified and add to the
+      specified database scema control table"
     end
 
     def run!(action = config.action, parent_id = config.parent_id)
@@ -166,6 +171,8 @@ module PSQLCM
         restore!
       when "setup"
         setup!
+      when "change"
+        change!
       else
         halt! "Action '#{action}' is not handled."
       end
