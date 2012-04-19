@@ -36,18 +36,20 @@ module PSQLCM
     end
 
     def pgpass # Ensure a pgpass entry exists for this connection.
-      pgpass_line = [
-        @config[:host], @config[:port], @config[:dbname], @config[:user],
-        @config[:password]
-      ].join(':')
+      pgpass_line = [ @config[:host], @config[:port], @config[:dbname],
+                      @config[:user], @config[:password] ].join(':')
 
-      content = File.open(File.join(ENV['HOME'], '.pgpass'), 'r') { |file| file.read }
-      unless content.lines.detect{ |line| line == pgpass_line }
+      content = File.open(File.join(ENV['HOME'], '.pgpass'), 'r') do |file|
+        file.read
+      end.split("\n")
+
+      unless content.detect{ |line| line == pgpass_line }
         File.open(File.join(ENV['HOME'], '.pgpass'), 'w') do |file|
-          file.write(content + pgpass_line + "\n")
+          content << pgpass_line
+          file.write(content.join("\n") + "\n")
         end
+        File.chmod(0600, File.join(ENV['HOME'], '.pgpass'))
       end
-
       pgpass_line
     end # def pgpass
 
