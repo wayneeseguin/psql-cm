@@ -59,8 +59,8 @@ database cluster.
 
 # Command line parameters
 
---databases argument may take multiple database targets, to do this pass
-them in ',' separated. The format is,
+--databases argument may take multiple database targets, to do this pass them
+in ',' separated format, no spaces. Specifically the format is,
 
     $ psql-cm --databases psqlcm_test,psqlcm_test2,... ...
 
