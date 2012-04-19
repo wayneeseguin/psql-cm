@@ -20,7 +20,7 @@ end
 desc "Build then install the psql-cm gem."
 task :install => :build do
   require 'psql-cm/version'
-  %x{gem install psql-cm-#{PSQLCM::Version}.gem}
+  %x{gem install psql-cm-#{::PSQLCM::Version}.gem}
 end
 
 task :default => :install
@@ -33,6 +33,15 @@ end
 desc "Development console, builds installs then runs console"
 task :console => :install do
   psqlcm :actions => 'console'
+end
+
+task :release do
+  require 'psql-cm/version'
+
+  %x{git tag -a #{::PSQLCM::Version}}
+  %x{git push origin --tags}
+  %x{gem build psql-cm.gemspec}
+  %x{gem push psql-cm-#{::PSQLCM::Version}.gem}
 end
 
 require 'rake/testtask'
