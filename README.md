@@ -15,8 +15,7 @@ combined with complimentary process and adherence.
 
 ## What psql-cm is not
 
-psql-cm is not intended on being a solution whatsoever for data backup.
-
+psql-cm is not intended on being a solution for data backup.
 For backup of data instead use the
 [pg\_dump](http://www.postgresql.org/docs/current/static/app-pgdump.html)
 command line utility for backing up data in addition to a
