@@ -69,9 +69,12 @@ module PSQLCM
       @db[name] = Connection.new(:dbname => name)
     end
 
-    # "postgres://{user}:{password}@{host}:{port}/{database}"
     def configure!
-      uri = URI.parse(::PSQLCM.config.uri)
+      begin
+        uri = URI.parse(::PSQLCM.config.uri)
+      rescue => error
+        halt! "PostgreSQL URI was incorrectly specified, format is:\n  --uri=postgres://{user}:{password}@{host}:{port}/{database}\nwhere user, password and port are optional."
+      end
 
       query = uri.query.to_s.split('&')
 

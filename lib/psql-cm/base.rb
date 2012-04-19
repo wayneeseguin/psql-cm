@@ -22,7 +22,9 @@ module PSQLCM
         exec("SELECT datname as name FROM pg_database WHERE datname !~ 'template*|postgres';").
         map {|row| row["name"]}
 
-      unless config.databases.to_a.empty? # filter out databases not specified.
+      if config.databases.to_a.empty?
+        halt! "A list of databases must be given:\n  --databases={database_one}[,{database_two}[,...]]"
+      else # filter out databases not specified.
         @databases.select!{ |name| config.databases.include?(name) }
       end
 
