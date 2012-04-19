@@ -1,7 +1,27 @@
 # PostgreSQL Change Management Tool
 
-This project is a tool for schema change management within a PostgreSQL database
-cluster.
+## What psql-cm is
+
+This project is a tool to assist with an ITIL like change management process
+for *database schemas* within a PostgreSQL database cluster.
+
+Specifically psql-cm is a tool which encodes *one* change management process
+for a complex multi database, multi schema PostgreSQL system.
+
+This means that psql-cm may be much more than you need for a simple
+single database system.  Please take the time to understand the process and
+what problems it solves. In order for psql-cm to be effective it must be
+combined with complimentary process and adherence.
+
+## What psql-cm is not
+
+psql-cm is not intended on being a solution whatsoever for data backup.
+
+For backup of data instead use the
+[pg\_dump](http://www.postgresql.org/docs/current/static/app-pgdump.html)
+command line utility for backing up data in addition to a
+[repliaction](http://www.postgresql.org/docs/current/static/different-replication-solutions.html)
+technique tailored to your needs.
 
 # Prerequisites
 
@@ -14,33 +34,72 @@ cluster.
 Once the prerequisites have been satisfied on your system, using the
 'gem' command from Ruby 1.9.3 do:
 
-    user$ gem install psql-scm
+    $ gem install psql-scm
 
 # Setup
 
 Setup the psql\_cm control tables on the target databases, use a comma (',')
 to separate multiple database names.
 
-    user$ psql-cm --databases psqlcm_test --uri "postgres://127.0.0.1:5432" setup
+    $ psql-cm --databases psqlcm_test --uri "postgres://127.0.0.1:5432" setup
 
 # Dump
 
 Dump the current database schema to the specified --sql-path directory, if none
 specified it dumps to $PWD/sql
 
-    user$ psql-cm --databases psqlcm_test --uri "postgres://127.0.0.1:5432" dump
+    $ psql-cm --databases psqlcm_test --uri "postgres://127.0.0.1:5432" dump
 
 # Restore (Currently being implemented)
 
 Restore a previously psql-cm dumped database schema into a brand new postgresql
 database cluster.
 
-    user$ psql-cm --databases psqlcm_test --uri "postgres://127.0.0.1:5432" restore
+    $ psql-cm --databases psqlcm_test --uri "postgres://127.0.0.1:5432" restore
 
-# Example
+# Command line parameters
 
-    user$ createdb psqlcm_test
-    user$ psql psqlcm_test -c 'CREATE SCHEMA schema_one; CREATE SCHEMA schema_two'
-    user$ echo psql-cm --databases psqlcm_test --uri "postgres://127.0.0.1:5432" setup
-    user$ psql-cm --databases psqlcm_test --uri "postgres://127.0.0.1:5432" dump
+--databases argument may take multiple database targets, to do this pass
+them in ',' separated. The format is,
+
+    $ psql-cm --databases psqlcm_test,psqlcm_test2,... ...
+
+--uri has the format,
+
+    $ psql-cm --uri "postgres://{user}:{password}@{host}:{port}/{database}?{sslmode}={mode}
+
+Where user, password, port, and sslmode are optional.
+
+sslmode mode may be one of disable, allow, prefer, require
+
+# Examples
+
+    $ createdb psqlcm_test
+    $ psql psqlcm_test -c 'CREATE SCHEMA schema_one; CREATE SCHEMA schema_two'
+    $ psql psqlcm_test -c 'CREATE TABLE a_bool(a BOOL);'
+    $ psql psqlcm_test -c 'SET search_path = schema_one; CREATE TABLE an_integer(an INTEGER);'
+    $ psql psqlcm_test -c 'SET search_path = schema_two; CREATE TABLE a_varchar(a VARCHAR);'
+    $ psql-cm --databases psqlcm_test --uri "postgres://127.0.0.1:5432" setup
+
+Use your favorite PostgreSQL client tool (psql/pgAdmin/Navicat/...) and examine
+the schemas for the psqlcm\_test database for which there should be three,
+public, schema\_one, schema\_two. each with two tables, the pg\_psql\_cm
+control table and one other table.
+
+Next we'll dump the schema to sql/ within our working directory
+
+    $ psql-cm --databases psqlcm_test --uri "postgres://127.0.0.1:5432" dump
+
+At this point we have the base schema for the psqlcm\_test database recorded and
+we can test to see that this is true by droping the database and then running
+the psql-cm restore action.
+
+    $ dropdb psqlcm_test
+    $ psql-cm --databases psqlcm_test --uri "postgres://127.0.0.1:5432" restore
+
+Once again use yoru favorite client tool and verify that the schema is inded
+what it was after setup was run.
+
+Note that one caveat is that psql-cm does not handle ROLEs and USERs so these
+will have to be accounted for after doing a restore.
 
