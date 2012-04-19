@@ -70,15 +70,16 @@ in ',' separated format, no spaces. Specifically the format is,
 
 --uri has the format,
 
-    $ psql-cm --uri "postgres://{user}:{password}@{host}:{port}/{database}?{sslmode}={mode}
+    $ psql-cm --uri "postgres://{user}:{password}@{host}:{port}/{database}?{sslmode}={mode}"
 
-Where user, password, port, and sslmode are optional.
+user, password, port, the ? and everything after it (the query) are all optional.
 
-sslmode mode may be one of disable, allow, prefer, require
+sslmode mode may be one of disable, allow, prefer, require if used.
 
 # Walkthrough
 
 First let's create a PostgreSQL database for us to work with,
+
     $ createdb psqlcm_test
 
 Next let's create two schemas in addition to the public schema (which is added
@@ -105,10 +106,14 @@ database schemas.
 
     $ psql-cm --databases psqlcm_test --uri "postgres://127.0.0.1:5432" setup
 
-Use your favorite PostgreSQL client tool (psql/pgAdmin/Navicat/...) and examine
-the schemas for the psqlcm\_test database for which there should be three,
-public, schema\_one, schema\_two. each with two tables, the pg\_psql\_cm
-control table and one other table.
+Use a PostgreSQL client tool (psql/pgAdmin/Navicat/...) and examine the schemas
+for the psqlcm\_test database for which there should be three:
+
+    public
+    schema_one
+    schema_two
+
+each with two tables, the pg\_psql\_cm control table and one other table.
 
 Next we'll dump the schema to sql/ within our working directory
 
