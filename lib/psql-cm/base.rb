@@ -162,7 +162,6 @@ module PSQLCM
     def run!(action = config.action, parent_id = config.parent_id)
       case action
       when "console"
-        ::PSQLCM.debug "Starting Console"
         require 'psql-cm/cli'
         ::PSQLCM::Console.run!
       when "dump"
@@ -174,13 +173,14 @@ module PSQLCM
       when "change"
         change!
       else
+        halt! "An action must be given! {setup, dump, restore}" if action.nil?
         halt! "Action '#{action}' is not handled."
       end
     end
 
     def sh(tag, command)
       debug "sh:#{tag}> #{command}"
-      %x[#{command}]
+      %x[#{command} 2>&1 | awk '! /already exists|create implicit/']
     end
 
   end # class << self
