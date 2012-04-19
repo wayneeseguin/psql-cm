@@ -50,7 +50,7 @@ specified it dumps to $PWD/sql
 
     $ psql-cm --databases psqlcm_test --uri "postgres://127.0.0.1:5432" dump
 
-# Restore (Currently being implemented)
+# Restore
 
 Restore a previously psql-cm dumped database schema into a brand new postgresql
 database cluster.
