@@ -75,6 +75,9 @@ to a sql file. An example of each follows.
     $ echo "ALTER TABLE schema_two.a_varchar ADD COLUMN a_timestamp timestamptz;" > add_a_timestamp.sql
     $ psql-cm submit --database psqlcm_test --change add_a_timestamp.sql
 
+Note that when we do not specify a full path to the file, psql-cm will look
+for the file in the current working directory.
+
 ## Command line parameters
 
 --database argument specifies a single database name and can be used multiple
