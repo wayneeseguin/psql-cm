@@ -14,16 +14,24 @@ module PSQLCM
             ::PSQLCM.config.sql_path = path
           end
 
-          options.on('-a', '--databases=NAMES', 'A comma separated list of databases to cm.') do |names|
-            ::PSQLCM.config.databases += names.split(',')
-          end
-
-          options.on('-d', '--database=NAME', 'A single databases name.') do |name|
+          options.on('-d', '--database NAME', 'A single databases name.') do |name|
             ::PSQLCM.config.databases << name
           end
 
-          options.on('-u', '--uri=URI', 'Path to the sink database connection file.') do |uri|
+          options.on('-a', '--databases NAMES', 'A comma separated list of databases to cm.') do |names|
+            ::PSQLCM.config.databases += names.split(',')
+          end
+
+          options.on('-u', '--uri URI', 'Path to the sink database connection file.') do |uri|
             ::PSQLCM.config.uri = uri
+          end
+
+          options.on('-c', '--change SQL') do |change|
+            ::PSQLCM.config.change = change
+          end
+
+          options.on('-t', '--cm-table TABLE') do |cm_table|
+            ::PSQLCM.config.cm_table = cm_table
           end
 
           options.on('-D', '--[no-]debug', 'Output debugging information.') do |debug|
@@ -32,14 +40,6 @@ module PSQLCM
 
           options.on('-v', '--[no-]verbose', 'Output verbosley.') do |verbose|
             ::PSQLCM.config.verbose = verbose
-          end
-
-          options.on('-t', '--cm-table=TABLE') do |cm_table|
-            ::PSQLCM.config.cm_table = cm_table
-          end
-
-          options.on('-c', '--content=SQL') do |content|
-            ::PSQLCM.config.content = content
           end
 
           options.on_tail('-h', '--help', 'Print help and exit.') do

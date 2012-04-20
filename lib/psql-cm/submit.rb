@@ -4,15 +4,15 @@ module PSQLCM
       puts "TODO: allow change string and/or file to be specified and add to the
       specified database scema control table"
 
-      if config.content.to_s.empty?
+      if config.change.to_s.empty?
         halt! "Content must be given! (--content=<file or \"sql string\">)"
-      elsif File.exists?(config.content)
-        content = File.open(config.content, 'r') { |file| file.read }
+      elsif File.exists?(config.change)
+        content = File.open(config.change, 'r') { |file| file.read }
       else # SQL String
         content = %x{cat #{temp_file.path}}
       end
 
-      debug "validate> #{database}.#{schema}.#{config.cm_table}: #{config.content}"
+      debug "validate> #{database}.#{schema}.#{config.cm_table}: #{config.change}"
 
       # TODO:
       # - Ensure no 'INSERT' or 'COPY' if SQL string.
@@ -23,7 +23,7 @@ module PSQLCM
       implementer = "#{name}"
       implementer << "<#{email}>" unless email.empty?
 
-      debug "submit> #{database}.#{schema}.#{config.cm_table}: #{config.content}"
+      debug "submit> #{database}.#{schema}.#{config.cm_table}: #{config.change}"
       db(database).exec(
         "INSERT INTO #{schema}.#{config.cm_table}
           (is_base,implementer,content)
