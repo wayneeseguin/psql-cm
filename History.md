@@ -1,6 +1,9 @@
 # 0.0.7 - 2012-04-20
 
-Implemented 'submit' action.
+--database CLI option for specifying a single database name.
+
+--change CLI option for submitting either a sql change string or an sql change
+file name.
 
 # 0.0.6 - 2012-04-20
 
