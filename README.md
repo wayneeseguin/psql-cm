@@ -198,9 +198,9 @@ seen including all debugging output by running:
 
 Specifically to do a full-cycle walkthrough on the psqlcm\_development database,
 
-    rake create setup dump drop restore
+    rake create setup dump drop restore submit:string submit:file
 
 Then to re-run the full cycle we need to add 'drop' in the front,
 
-    rake drop create setup dump drop restore
+    rake drop create setup dump drop restore submit:string submit:file
 
