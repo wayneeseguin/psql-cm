@@ -68,8 +68,7 @@ to a sql file. An example of each follows.
 
 ### SQL String
 
-    $ psql-cm submit --database psqlcm_test --change \
-        "ALTER TABLE schema_two.a_varchar ADD COLUMN a_timestamp timestamptz;"
+    $ psql-cm submit --database psqlcm_test --change "ALTER TABLE schema_two.a_varchar ADD COLUMN a_timestamp timestamptz;"
 
 ### SQL File
 
