@@ -33,28 +33,28 @@ task :debug do
   ENV['DEBUG'] = "true"
 end
 
-desc "Build the psql-cm gem."
+desc "Build the psql-cm gem"
 task :build do
   shell "gem build psql-cm.gemspec"
 end
 
-desc "Build then install the psql-cm gem."
+desc "Build then install the psql-cm gem"
 task :install => :build do
   require 'psql-cm/version'
   shell "gem install psql-cm-#{::PSQLCM::Version}.gem"
 end
 
-desc "Development console, builds installs then runs console"
+desc "Console, builds installs then runs console"
 task :console => :install do
   psqlcm 'console', :exec => true
 end
 
-desc "Drop the development database #{database}"
+desc "Drop the database #{database}"
 task :drop do
   shell "dropdb #{database};"
 end
 
-desc "Create the development database #{database}, including two schemas."
+desc "Create database #{database}, and two schemas"
 task :create => [:debug, :install] do
   shell "
     createdb #{database} &&
@@ -67,32 +67,34 @@ task :create => [:debug, :install] do
   "
 end
 
-desc "Run psql-cm restore action on #{database}."
+desc "Run psql-cm setup on schemas within #{database}"
 task :setup do
   psqlcm "setup"
 end
 
-desc "Remove the sql/ directory in the current working directory."
+desc "Remove sql/ in the current working directory"
 task :clean do
   FileUtils.rm_rf("#{ENV['PWD']}/sql") if Dir.exists?("#{ENV['PWD']}/sql")
 end
 
-desc "Run psql-cm restore action on #{database}."
-task :dump => [:clean] do
+desc "Run psql-cm dump on #{database}"
+task :dump do
   psqlcm "dump"
 end
 
-desc "Run psql-cm restore action on #{database}."
+desc "Run psql-cm restore on #{database}"
 task :restore do
   psqlcm "restore"
 end
 
 namespace :submit do
+  desc "Run psql-cm submit with a string change from cli"
   task :string => [:install] do
     sql = "ALTER TABLE a_varchar ADD COLUMN a_timestamp timestamptz;"
     psqlcm "submit", :schema => "schema_two", :change => sql
   end
 
+  desc "Run psql-cm submit with a file based change"
   task :file => [:install] do
     sql = "CREATE TABLE a_timestamp (a_timestamp timestamptz);"
     require 'tempfile'

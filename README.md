@@ -183,17 +183,24 @@ To play around inside of a running psql-cm Ruby environment use the console:
 The 'Walkthrough' from above is encoded as rake tasks, each step can be
 seen including all debugging output by running:
 
-    rake clean      # Remove the sql/ directory in the current working directory.
-    rake create     # Create the development database psqlcm_development, including two schemas.
-    rake debug      # Enable debugging using environment variable DEBUG
-    rake drop       # Drop the development database psqlcm_development
-    rake dump       # Remove sql/ from CWD and then run the psql-cm dump action on psqlcm_development
-    rake build      # Build the psql-cm gem.
-    rake install    # Build then install the psql-cm gem.
-    rake restore    # Create psqlcm_development, run psql-cm actions {setup, dump, restore} in order.
-    rake setup      # Create psqlcm_development and run psql-cm setup on it
+    rake build          # Build the psql-cm gem
+    rake clean          # Remove sql/ in the current working directory
+    rake console        # Console, builds installs then runs console
+    rake create         # Create database psqlcm_development, and two schemas
+    rake debug          # Enable debugging using environment variable DEBUG
+    rake drop           # Drop the database psqlcm_development
+    rake dump           # Run psql-cm dump on psqlcm_development
+    rake install        # Build then install the psql-cm gem
+    rake restore        # Run psql-cm restore on psqlcm_development
+    rake setup          # Run psql-cm setup on schemas within psqlcm_development
+    rake submit:file    # Run psql-cm submit with a file based change
+    rake submit:string  # Run psql-cm submit with a string change from cli
 
 Specifically to do a full-cycle walkthrough on the psqlcm\_development database,
+
+    rake create setup dump drop restore
+
+Then to re-run the full cycle we need to add 'drop' in the front,
 
     rake drop create setup dump drop restore
 
