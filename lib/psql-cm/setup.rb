@@ -10,14 +10,19 @@ module PSQLCM
           Tempfile.open('base.sql') do |temp_file|
             sh " pg_dump #{db(database).psql_args} --schema-only --no-owner --schema=#{schema} --file=#{temp_file.path} #{database}"
 
-            contents = %x{cat #{temp_file.path}}
-            implementer = %Q|#{%x[git config user.name].strip} <#{%x[git config user.email].strip}>|
+            content = %x{cat #{temp_file.path}}
+            name = %x{git config user.name}.strip
+            email = %x{git config user.email}.strip
+            implementer = "#{name}"
+            implementer << "<#{email}>" unless email.empty?
+
             db(database).exec(
-              "INSERT INTO #{schema}.#{config.cm_table} (is_base, implementer, content) VALUES (true, $1, $2);",
-              [implementer, contents]
+              "INSERT INTO #{schema}.#{config.cm_table}
+              (is_base, implementer, content)
+              VALUES (true, $1, $2);",
+              [implementer, content]
             )
           end
-
         end
       end
 

@@ -52,10 +52,11 @@ task :create => [:debug, :install] do
   sh "
     createdb #{database} &&
     psql #{database} -c '
-      CREATE SCHEMA schema_one;
-      CREATE SCHEMA schema_two;
-      CREATE TABLE schema_one.first(an integer);
-      CREATE TABLE schema_two.second(a timestamptz);'
+        CREATE SCHEMA schema_one;
+        CREATE SCHEMA schema_two;
+        CREATE TABLE public.a_bool(a BOOL);
+        CREATE TABLE schema_one.an_integer(an INTEGER);
+        CREATE TABLE schema_two.a_varchar(a VARCHAR);'
   "
 end
 
@@ -80,7 +81,8 @@ task :restore  => [:setup, :dump] do
 end
 
 task :submit  => [:setup] do
-  # TODO: Implement psql-cm "submit", ...
+  # TODO: Add some change submissions here
+  psqlcm "submit"
 end
 
 task :release do

@@ -44,21 +44,21 @@ Once the prerequisites have been satisfied on your system, using the
 Setup the psql\_cm control tables on the target databases, use a comma (',')
 to separate multiple database names.
 
-    $ psql-cm setup --databases psqlcm_test
+    $ psql-cm setup --database psqlcm_test
 
 ## Dump
 
 Dump the current database schema to the specified --sql-path directory, if none
 specified it dumps to $PWD/sql
 
-    $ psql-cm dump --databases psqlcm_test
+    $ psql-cm dump --database psqlcm_test
 
 ## Restore
 
 Restore a previously psql-cm dumped database schema into a brand new postgresql
 database cluster.
 
-    $ psql-cm restore --databases psqlcm_test
+    $ psql-cm restore --database psqlcm_test
 
 ## Submit
 
@@ -68,18 +68,23 @@ to a sql file. An example of each follows.
 
 ### SQL String
 
-    $ psql-cm submit --databases psqlcm_test --change \
+    $ psql-cm submit --database psqlcm_test --change \
         "ALTER TABLE schema_two.a_varchar ADD COLUMN a_timestamp timestamptz;"
 
 ### SQL File
 
-    $ echo "ALTER TABLE schema_two.a_varchar ADD COLUMN a_timestamp timestamptz;" \
-        > add_a_timestamp.sql
-    $ psql-cm submit --databases psqlcm_test --change add_a_timestamp.sql
+    $ echo "ALTER TABLE schema_two.a_varchar ADD COLUMN a_timestamp timestamptz;" > add_a_timestamp.sql
+    $ psql-cm submit --database psqlcm_test --change add_a_timestamp.sql
 
 ## Command line parameters
 
---databases argument may take multiple database targets, to do this pass them
+--database argument specifies a single database name and can be used multiple
+times if required, although using the --databases argument (below) is more
+succient and preferred.
+
+    $ psql-cm --database adatabase
+
+--database argument may take multiple database targets, to do this pass them
 in ',' separated format, no spaces. Specifically the format is,
 
     $ psql-cm --databases adatabase,anotherdatabase,... ...
@@ -89,9 +94,10 @@ has the format,
 
     $ psql-cm --uri "postgres://{user}:{password}@{host}:{port}/{database}?{sslmode}={mode}"
 
-user, password, port, the ? and everything after it (the query) are all optional.
+Host and database are the only required entries in a uri string. Eg.  user,
+password, port, the ? and everything after it (the query) are all optional.
 
-sslmode mode may be one of disable, allow, prefer, require if used.
+sslmode mode may be one of {disable, allow, prefer, require} if it is used.
 
 # Walkthrough
 
@@ -117,7 +123,7 @@ change management process to we can setup the psql-cm control tables.
 The setup action adds one table called 'pg\_psql\_cm' to each of the target
 database schemas.
 
-    $ psql-cm --databases psqlcm_test setup
+    $ psql-cm --database psqlcm_test setup
 
 Use a PostgreSQL client tool (psql/pgAdmin/Navicat/...) and examine the schemas
 for the psqlcm\_test database for which there should be three:
@@ -130,7 +136,7 @@ each with two tables, the pg\_psql\_cm control table and one other table.
 
 Next we'll dump the schema to sql/ within our working directory
 
-    $ psql-cm --databases psqlcm_test dump
+    $ psql-cm --database psqlcm_test dump
 
 At this point we have the base schema for the psqlcm\_test database recorded to
 the filesystem. You can see the filesystem structure and contents with
@@ -146,7 +152,7 @@ We can now do a restore restore by droping the database and then running the
 psql-cm restore action.
 
     $ dropdb psqlcm_test
-    $ psql-cm --databases psqlcm_test restore
+    $ psql-cm --database psqlcm_test restore
 
 Once again useing a client tool and verify that the schema is inded what it was
 after setup was run.

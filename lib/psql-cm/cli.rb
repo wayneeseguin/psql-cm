@@ -10,12 +10,16 @@ module PSQLCM
           options.separator ''
           options.separator 'Specific options:'
 
-          options.on('-s', '--sql-path PATH', 'Path to dump SQL cm files into.') do |path|
+          options.on('-p', '--sql-path PATH', 'Path to dump SQL cm files into.') do |path|
             ::PSQLCM.config.sql_path = path
           end
 
           options.on('-a', '--databases=NAMES', 'A comma separated list of databases to cm.') do |names|
-            ::PSQLCM.config.databases = names.split(',')
+            ::PSQLCM.config.databases += names.split(',')
+          end
+
+          options.on('-d', '--database=NAME', 'A single databases name.') do |name|
+            ::PSQLCM.config.databases << name
           end
 
           options.on('-u', '--uri=URI', 'Path to the sink database connection file.') do |uri|
@@ -30,8 +34,12 @@ module PSQLCM
             ::PSQLCM.config.verbose = verbose
           end
 
-          options.on('-c', '--cm-table=TABLE') do |cm_table|
+          options.on('-t', '--cm-table=TABLE') do |cm_table|
             ::PSQLCM.config.cm_table = cm_table
+          end
+
+          options.on('-c', '--content=SQL') do |content|
+            ::PSQLCM.config.content = content
           end
 
           options.on_tail('-h', '--help', 'Print help and exit.') do
