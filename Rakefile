@@ -94,15 +94,3 @@ task :release do
   gem push psql-cm-#{::PSQLCM::Version}.gem
   "
 end
-
-require 'rake/testtask'
-
-task :spec => "spec:test"
-
-namespace :spec do
-  Rake::TestTask.new do |task|
-    task.libs.push "lib"
-    task.test_files = FileList['spec/*_spec.rb']
-    task.verbose = true
-  end
-end
