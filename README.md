@@ -1,5 +1,29 @@
 # PostgreSQL Change Management Tool
 
+## Overview
+
+Experienced software engineers and database administrators know very well that
+database systems need care and feeding, especially as they grow over time.
+
+A Database Change Management System (DB CMS) is one method of carefully
+accounting for  changes to live database schemas in a controlled manner with
+full history and auditability of who changed what and when.
+
+A DB CMS itself is a well documented process and is typically required to meet
+the following criteria,
+
+- Control the deployment of changes to a schema, specifically the DDL and DML,
+  in a controlled and auditable manner
+
+- Control the deployment of the DDL from one Server/Database/Schema to another
+
+- Integrate directly with the database system, backups and restores while
+  preserving the integrity of the data schema within the CMS
+
+- Regenerate DDL for Disaster Recovery in the absence of database backups
+
+psql-cm is a tool which was created to help make achieving these goals easier.
+
 ## What psql-cm is
 
 This project is a tool to assist with an ITIL like change management process
