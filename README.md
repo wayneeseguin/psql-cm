@@ -155,8 +155,8 @@ a find command on \*nix:
     sql/psqlcm_test/schema_one.sql
     sql/psqlcm_test/schema_two.sql
 
-We can now do a restore restore by droping the database and then running the
-psql-cm restore action.
+We can now do a restore by droping the database and then running the psql-cm
+restore action.
 
     $ dropdb psqlcm_test
     $ psql-cm --database psqlcm_test restore
