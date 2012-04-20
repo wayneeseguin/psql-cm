@@ -140,7 +140,7 @@ psql-cm restore action.
     $ dropdb psqlcm_test
     $ psql-cm --databases psqlcm_test --uri "postgres://127.0.0.1:5432" restore
 
-Once again use yoru favorite client tool and verify that the schema is inded
+Once again use your favorite client tool and verify that the schema is inded
 what it was after setup was run.
 
 Note that one caveat is that psql-cm does not handle ROLEs and USERs so these
