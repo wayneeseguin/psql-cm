@@ -68,31 +68,36 @@ to a sql file. An example of each follows.
 
 ### SQL String
 
-    $ psql-cm submit --database psqlcm_test --change "ALTER TABLE schema_two.a_varchar ADD COLUMN a_timestamp timestamptz;"
+    $ psql-cm submit --database psqlcm_test --schema schema_two --change "ALTER TABLE a_varchar ADD COLUMN a_timestamp timestamptz;"
+
+Note that if you do not specify --schema the change is applied against the
+default schema (typically 'public').
 
 ### SQL File
 
-    $ echo "ALTER TABLE schema_two.a_varchar ADD COLUMN a_timestamp timestamptz;" > add_a_timestamp.sql
-    $ psql-cm submit --database psqlcm_test --change add_a_timestamp.sql
+    $ echo "ALTER TABLE a_varchar ADD COLUMN a_timestamp timestamptz;" > add_a_timestamp.sql
+    $ psql-cm submit --database psqlcm_test --schema schema_two --change add_a_timestamp.sql
 
 Note that when we do not specify a full path to the file, psql-cm will look
 for the file in the current working directory.
 
-## Command line parameters
+## Options
 
---database argument specifies a single database name and can be used multiple
-times if required, although using the --databases argument (below) is more
-succient and preferred.
+Available actions are those exposed above
+
+````--database```` argument specifies a single database name and can be used
+multiple times if required, although using the --databases argument (below) is
+more succient and preferred.
 
     $ psql-cm --database a_database
 
---database argument may take multiple database targets, to do this pass them
-in ',' separated format, no spaces. Specifically the format is,
+````--database```` argument may take multiple database targets, to do this pass
+them in ',' separated format, no spaces. Specifically the format is,
 
     $ psql-cm --databases a_database,another_database,... ...
 
---uri can be given to change from the default of "postgres://127.0.0.1:5432" and
-has the format,
+````--uri```` can be given to change from the default of
+"postgres://127.0.0.1:5432" and has the format,
 
     $ psql-cm --uri "postgres://{user}:{password}@{host}:{port}/{database}?{sslmode}={mode}"
 
@@ -187,4 +192,8 @@ seen including all debugging output by running:
     rake install    # Build then install the psql-cm gem.
     rake restore    # Create psqlcm_development, run psql-cm actions {setup, dump, restore} in order.
     rake setup      # Create psqlcm_development and run psql-cm setup on it
+
+Specifically to do a full-cycle walkthrough on the psqlcm\_development database,
+
+    rake drop create setup dump drop restore
 

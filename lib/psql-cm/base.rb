@@ -31,13 +31,16 @@ module PSQLCM
       @databases
     end
 
-    def schemas(name = 'postgres')
-      @schemas = db(name).
-        exec("SELECT nspname AS name FROM pg_namespace WHERE nspname !~ '^pg_.*|information_schema';").
-        map{|row| row['name']}
+    def schemas(dbname = 'postgres')
+      schema_select = "SELECT nspname AS name FROM pg_namespace WHERE nspname !~ '^pg_.*|information_schema';"
+
+      @schemas = db(dbname).exec(schema_select).map{|row| row['name']}
 
       # Filter out schemas not specified, if specified.
-      @schemas.select!{ |name| config.schemas.include?(name) } if config.schemas
+      unless config.schemas.empty?
+        @schemas.select!{ |name| config.schemas.include?(name) }
+      end
+
       debug "schemas> #{@schemas}"
       @schemas
     end
@@ -132,4 +135,5 @@ end
 ::PSQLCM.config.debug = !!ENV['DEBUG']
 ::PSQLCM.config.cm_table = 'pg_psql_cm' # Default --cm-table name.
 ::PSQLCM.config.databases = []
+::PSQLCM.config.schemas = []
 

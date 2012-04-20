@@ -5,6 +5,8 @@
 --change CLI option for submitting either a sql change string or an sql change
 file name.
 
+Implemented 'submit' action.
+
 # 0.0.6 - 2012-04-20
 
 Merged {base.sql, cm.sql} into a single sql-path/{database}/{schema}.sql file.

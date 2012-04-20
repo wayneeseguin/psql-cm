@@ -7,11 +7,18 @@ def database
 end
 
 def psqlcm(action, params = {})
-  command = %Q|psql-cm --databases #{database} #{action}|
-  sh command, params
+  command = "psql-cm #{action}"
+  params[:database] ||= database
+  [:database,:schema,:change].each do |param|
+    if params[param]
+      command << " --#{param} '#{params[param]}'"
+      params.delete(param)
+    end
+  end
+  shell command, params
 end
 
-def sh(command, options = {})
+def shell(command, options = {})
   $stdout.puts command if ENV['debug'] || ENV['DEBUG']
   exec command if options[:exec]
   if ENV['verbose'] || ENV["VERBOSE"]
@@ -28,13 +35,13 @@ end
 
 desc "Build the psql-cm gem."
 task :build do
-  sh "gem build psql-cm.gemspec"
+  shell "gem build psql-cm.gemspec"
 end
 
 desc "Build then install the psql-cm gem."
 task :install => :build do
   require 'psql-cm/version'
-  sh "gem install psql-cm-#{::PSQLCM::Version}.gem"
+  shell "gem install psql-cm-#{::PSQLCM::Version}.gem"
 end
 
 desc "Development console, builds installs then runs console"
@@ -44,12 +51,12 @@ end
 
 desc "Drop the development database #{database}"
 task :drop do
-  sh "dropdb #{database};"
+  shell "dropdb #{database};"
 end
 
 desc "Create the development database #{database}, including two schemas."
 task :create => [:debug, :install] do
-  sh "
+  shell "
     createdb #{database} &&
     psql #{database} -c '
         CREATE SCHEMA schema_one;
@@ -60,8 +67,8 @@ task :create => [:debug, :install] do
   "
 end
 
-desc "Create #{database} and run psql-cm setup on it"
-task :setup => [:create] do
+desc "Run psql-cm restore action on #{database}."
+task :setup do
   psqlcm "setup"
 end
 
@@ -70,27 +77,38 @@ task :clean do
   FileUtils.rm_rf("#{ENV['PWD']}/sql") if Dir.exists?("#{ENV['PWD']}/sql")
 end
 
-desc "Remove sql/ from CWD and then run the psql-cm dump action on #{database}"
+desc "Run psql-cm restore action on #{database}."
 task :dump => [:clean] do
   psqlcm "dump"
 end
 
-desc "Create #{database}, run psql-cm actions {setup, dump, restore} in order."
-task :restore  => [:setup, :dump] do
-  psqlcm "setup"
+desc "Run psql-cm restore action on #{database}."
+task :restore do
+  psqlcm "restore"
 end
 
-task :submit  => [:setup] do
-  # TODO: Add some change submissions here
-  psqlcm "submit"
+namespace :submit do
+  task :string => [:install] do
+    sql = "ALTER TABLE a_varchar ADD COLUMN a_timestamp timestamptz;"
+    psqlcm "submit", :schema => "schema_two", :change => sql
+  end
+
+  task :file => [:install] do
+    sql = "CREATE TABLE a_timestamp (a_timestamp timestamptz);"
+    require 'tempfile'
+    Tempfile.open('change.sql') do |change_file|
+      change_file.write sql
+      psqlcm "submit", :schema => "schema_two", :change => change_file.path
+    end
+  end
 end
 
 task :release do
   require 'psql-cm/version'
-  sh "
+  shell "
   git tag #{::PSQLCM::Version};
   git push origin --tags;
   gem build psql-cm.gemspec;
-  gem push psql-cm-#{::PSQLCM::Version}.gem
+  gem push psql-cm-#{::PSQLCM::Version}.gem;
   "
 end

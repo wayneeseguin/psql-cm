@@ -22,11 +22,19 @@ module PSQLCM
             ::PSQLCM.config.databases += names.split(',')
           end
 
+          options.on('-s', '--schema NAME', 'A single schemas name.') do |name|
+            ::PSQLCM.config.schemas << name
+          end
+
+          options.on('-m', '--schemas NAMES', 'A comma separated list of schemas to cm.') do |names|
+            ::PSQLCM.config.schemas += names.split(',')
+          end
+
           options.on('-u', '--uri URI', 'Path to the sink database connection file.') do |uri|
             ::PSQLCM.config.uri = uri
           end
 
-          options.on('-c', '--change SQL') do |change|
+          options.on('-c', '--change SQL|FILE') do |change|
             ::PSQLCM.config.change = change
           end
 
