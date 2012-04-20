@@ -78,7 +78,7 @@ module PSQLCM
 
     def uri
       return config.uri unless config.uri.to_s.empty?
-      $stdout.puts "NOTICE: uri is not set, defaulting to postgres://127.0.0.1:5432 (format: postgres://{user}:{password}@{host}:{port}/{database}\nwhere user, password, port and database are optional)"
+      $stdout.puts "NOTICE: uri is not set, defaulting to postgres://127.0.0.1:5432 (format: postgres://{user}:{password}@{host}:{port}/{database} (where user, password, port and database are optional)"
       config.uri = "postgres://127.0.0.1:5432"
     end
 
