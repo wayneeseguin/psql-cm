@@ -12,10 +12,11 @@ full history and auditability of who changed what and when.
 A DB CMS itself is a well documented process and is typically required to meet
 the following criteria,
 
-- Control the deployment of changes to a schema, specifically the DDL and DML,
+- Managed the deployment of changes to a schema, specifically the DDL and DML,
   in a controlled and auditable manner
 
-- Control the deployment of the DDL from one Server/Database/Schema to another
+- Control the deployment / migration of DDL from one Server/Database/Schema to
+  another
 
 - Integrate directly with the database system, backups and restores while
   preserving the integrity of the data schema within the CMS
