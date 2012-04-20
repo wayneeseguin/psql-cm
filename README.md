@@ -81,12 +81,12 @@ to a sql file. An example of each follows.
 times if required, although using the --databases argument (below) is more
 succient and preferred.
 
-    $ psql-cm --database adatabase
+    $ psql-cm --database a_database
 
 --database argument may take multiple database targets, to do this pass them
 in ',' separated format, no spaces. Specifically the format is,
 
-    $ psql-cm --databases adatabase,anotherdatabase,... ...
+    $ psql-cm --databases a_database,another_database,... ...
 
 --uri can be given to change from the default of "postgres://127.0.0.1:5432" and
 has the format,
