@@ -16,7 +16,7 @@ module PSQLCM
 
     def db
       unless @config[:dbname] == 'postgres'
-        ::PSQLCM.sh 'createdb', "createdb #{psql_args} #{@config[:dbname]}"
+        ::PSQLCM.sh "createdb #{psql_args} #{@config[:dbname]}"
       end
 
       @db || connect!
@@ -71,9 +71,9 @@ module PSQLCM
 
     def configure!
       begin
-        uri = URI.parse(::PSQLCM.config.uri)
+        uri = URI.parse(::PSQLCM.uri)
       rescue => error
-        halt! "PostgreSQL URI was incorrectly specified, format is:\n  --uri=postgres://{user}:{password}@{host}:{port}/{database}\nwhere user, password and port are optional."
+        halt! "PostgreSQL URI was incorrectly specified, format is:\n  --uri=postgres://{user}:{password}@{host}:{port}/{database}\nwhere user, password, port and database are optional."
       end
 
       query = uri.query.to_s.split('&')

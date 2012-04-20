@@ -60,12 +60,16 @@ database cluster.
 
     $ psql-cm --databases psqlcm_test --uri "postgres://127.0.0.1:5432" restore
 
+## Change
+
+TODO: Document how to commit a change.
+
 ## Command line parameters
 
 --databases argument may take multiple database targets, to do this pass them
 in ',' separated format, no spaces. Specifically the format is,
 
-    $ psql-cm --databases psqlcm_test,psqlcm_test2,... ...
+    $ psql-cm --databases adatabase,anotherdatabase,... ...
 
 --uri has the format,
 
@@ -140,9 +144,35 @@ psql-cm restore action.
     $ dropdb psqlcm_test
     $ psql-cm --databases psqlcm_test --uri "postgres://127.0.0.1:5432" restore
 
-Once again use yoru favorite client tool and verify that the schema is inded
-what it was after setup was run.
+Once again useing a client tool and verify that the schema is inded what it was
+after setup was run.
 
-Note that one caveat is that psql-cm does not handle ROLEs and USERs so these
-will have to be accounted for after doing a restore.
+NOTE: one caveat is that psql-cm does not handle ROLEs and USERs so these will
+have to be accounted for after doing a restore.
+
+## Debugging
+
+Debugging output can be enabled by exporting DEBUG=true in the environment
+before calling the psql-cm command:
+
+    $ export debug=true
+
+## Development
+
+To play around inside of a running psql-cm Ruby environment use the console:
+
+    rake console    # Development console, builds installs then runs console
+
+The 'Walkthrough' from above is encoded as rake tasks, each step can be
+seen including all debugging output by running:
+
+    rake clean      # Remove the sql/ directory in the current working directory.
+    rake create     # Create the development database psqlcm_development, including two schemas.
+    rake debug      # Enable debugging using environment variable DEBUG
+    rake drop       # Drop the development database psqlcm_development
+    rake dump       # Remove sql/ from CWD and then run the psql-cm dump action on psqlcm_development
+    rake build      # Build the psql-cm gem.
+    rake install    # Build then install the psql-cm gem.
+    rake restore    # Create psqlcm_development, run psql-cm actions {setup, dump, restore} in order.
+    rake setup      # Create psqlcm_development and run psql-cm setup on it
 
