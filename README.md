@@ -44,25 +44,38 @@ Once the prerequisites have been satisfied on your system, using the
 Setup the psql\_cm control tables on the target databases, use a comma (',')
 to separate multiple database names.
 
-    $ psql-cm --databases psqlcm_test --uri "postgres://127.0.0.1:5432" setup
+    $ psql-cm setup --databases psqlcm_test
 
 ## Dump
 
 Dump the current database schema to the specified --sql-path directory, if none
 specified it dumps to $PWD/sql
 
-    $ psql-cm --databases psqlcm_test --uri "postgres://127.0.0.1:5432" dump
+    $ psql-cm dump --databases psqlcm_test
 
 ## Restore
 
 Restore a previously psql-cm dumped database schema into a brand new postgresql
 database cluster.
 
-    $ psql-cm --databases psqlcm_test --uri "postgres://127.0.0.1:5432" restore
+    $ psql-cm restore --databases psqlcm_test
 
-## Change
+## Submit
 
-TODO: Document how to commit a change.
+There are two ways to submit schema changes. The first is by passing the schema
+change on the command line as a string and the second is by specifying the path
+to a sql file. An example of each follows.
+
+### SQL String
+
+    $ psql-cm submit --databases psqlcm_test --change \
+        "ALTER TABLE schema_two.a_varchar ADD COLUMN a_timestamp timestamptz;"
+
+### SQL File
+
+    $ echo "ALTER TABLE schema_two.a_varchar ADD COLUMN a_timestamp timestamptz;" \
+        > add_a_timestamp.sql
+    $ psql-cm submit --databases psqlcm_test --change add_a_timestamp.sql
 
 ## Command line parameters
 
@@ -71,7 +84,8 @@ in ',' separated format, no spaces. Specifically the format is,
 
     $ psql-cm --databases adatabase,anotherdatabase,... ...
 
---uri has the format,
+--uri can be given to change from the default of "postgres://127.0.0.1:5432" and
+has the format,
 
     $ psql-cm --uri "postgres://{user}:{password}@{host}:{port}/{database}?{sslmode}={mode}"
 
@@ -90,16 +104,12 @@ by default when the database is created) and a table for each schema for our
 database.
 
     $ psql psqlcm_test -c '
-        SET search_path = public;
         CREATE SCHEMA schema_one;
-        CREATE TABLE a_bool(a BOOL);
-
-        SET search_path = schema_one;
-        CREATE TABLE an_integer(an INTEGER);
-
         CREATE SCHEMA schema_two;
-        SET search_path = schema_two;
-        CREATE TABLE a_varchar(a VARCHAR);'
+        CREATE TABLE public.a_bool(a BOOL);
+        CREATE TABLE schema_one.an_integer(an INTEGER);
+        CREATE TABLE schema_two.a_varchar(a VARCHAR);'
+
 
 Now that we have a base set of database(s) and schemas that we wish to apply
 change management process to we can setup the psql-cm control tables.
@@ -107,7 +117,7 @@ change management process to we can setup the psql-cm control tables.
 The setup action adds one table called 'pg\_psql\_cm' to each of the target
 database schemas.
 
-    $ psql-cm --databases psqlcm_test --uri "postgres://127.0.0.1:5432" setup
+    $ psql-cm --databases psqlcm_test setup
 
 Use a PostgreSQL client tool (psql/pgAdmin/Navicat/...) and examine the schemas
 for the psqlcm\_test database for which there should be three:
@@ -120,29 +130,23 @@ each with two tables, the pg\_psql\_cm control table and one other table.
 
 Next we'll dump the schema to sql/ within our working directory
 
-    $ psql-cm --databases psqlcm_test --uri "postgres://127.0.0.1:5432" dump
+    $ psql-cm --databases psqlcm_test dump
 
 At this point we have the base schema for the psqlcm\_test database recorded to
 the filesystem. You can see the filesystem structure and contents with
 a find command on \*nix:
 
-    $ find sql/psqlcm_test
+    $ find sql/psqlcm_test/
     sql/psqlcm_test
-    sql/psqlcm_test/public
-    sql/psqlcm_test/public/base.sql
-    sql/psqlcm_test/public/cm.sql
-    sql/psqlcm_test/schema_one
-    sql/psqlcm_test/schema_one/base.sql
-    sql/psqlcm_test/schema_one/cm.sql
-    sql/psqlcm_test/schema_two
-    sql/psqlcm_test/schema_two/base.sql
-    sql/psqlcm_test/schema_two/cm.sql
+    sql/psqlcm_test/public.sql
+    sql/psqlcm_test/schema_one.sql
+    sql/psqlcm_test/schema_two.sql
 
 We can now do a restore restore by droping the database and then running the
 psql-cm restore action.
 
     $ dropdb psqlcm_test
-    $ psql-cm --databases psqlcm_test --uri "postgres://127.0.0.1:5432" restore
+    $ psql-cm --databases psqlcm_test restore
 
 Once again useing a client tool and verify that the schema is inded what it was
 after setup was run.
