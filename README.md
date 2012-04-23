@@ -62,7 +62,7 @@ technique tailored to your needs.
 Once the prerequisites have been satisfied on your system, using the
 'gem' command from Ruby 1.9.3 do:
 
-    $ gem install psql-scm
+    $ gem install psql-cm
 
 ## Setup
 
