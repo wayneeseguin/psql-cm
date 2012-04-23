@@ -1,3 +1,11 @@
+# 0.0.8 - 2012-04-23
+
+Corrected error message.
+
+Added overview to README as well as some clarifying changes.
+
+Added submit examples to README.
+
 # 0.0.7 - 2012-04-20
 
 --database CLI option for specifying a single database name.
