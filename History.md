@@ -1,3 +1,7 @@
+# 0.0.9 - 2012-04-23
+
+Dump now uses --no-privileges, privileges should be handled separately.
+
 # 0.0.8 - 2012-04-23
 
 Corrected error message.
