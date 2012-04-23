@@ -12,7 +12,7 @@ module PSQLCM
 
     # Delegator to PG::Connection
     def __getobj__ ; @db end
-    def __setobj__(object) ;  end
+    def __setobj__(object) end
 
     def db
       unless @config[:dbname] == 'postgres'

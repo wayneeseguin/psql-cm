@@ -4,7 +4,7 @@ module PSQLCM
       databases.each do |database|
         schemas(database).each do |schema|
           if config.change.to_s.empty?
-            halt! "Content must be given! (--content=<file or \"sql string\">)"
+            halt! "Content must be given! (--change=<file or \"sql string\">)"
           elsif File.exists?(config.change)
             content = File.open(config.change, 'r') { |file| file.read }
           else # SQL String

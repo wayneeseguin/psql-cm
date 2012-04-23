@@ -23,10 +23,10 @@ module PSQLCM
               sh "psql #{db(database).psql_args} #{database} < #{cm_file}"
 
               ensure_cm_table_exists(database,schema)
-              row = db(database).exec("SELECT content from #{schema}.#{config.cm_table}
+              Tempfile.open('base.sql') do |temp_file|
+                row = db(database).exec("SELECT content from #{schema}.#{config.cm_table}
                                       WHERE is_base IS true ORDER BY created_at
                                       DESC LIMIT 1;")
-              Tempfile.open('base.sql') do |temp_file|
                 temp_file.write(row)
                 sh "psql #{db(database).psql_args} #{database} < #{temp_file.path}"
               end
