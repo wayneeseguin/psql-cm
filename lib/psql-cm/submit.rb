@@ -25,18 +25,13 @@ module PSQLCM
           debug "submit> #{database}.#{schema}.#{config.cm_table}: #{config.change}"
           db(database).exec(
             "INSERT INTO #{schema}.#{config.cm_table}
-          (is_base,implementer,content)
-          VALUES (false,$1,$2)",
-            [implementer,content]
-          )
+              (is_base,implementer,content)
+              VALUES (false,$1,$2)",
+                [implementer,content]
+            )
         end # schemas
       end # databases
     end # def submit!
 
-    private
-
-    def validate(change)
-
-    end
   end
 end
