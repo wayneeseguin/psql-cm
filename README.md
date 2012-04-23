@@ -76,14 +76,14 @@ to separate multiple database names.
 Dump the current database schema to the specified --sql-path directory, if none
 specified it dumps to $PWD/sql
 
-    $ psql-cm dump --database psqlcm_test
+    $ psql-cm dump --database psqlcm_test --sql-path $HOME/sql
 
 ## Restore
 
 Restore a previously psql-cm dumped database schema into a brand new postgresql
 database cluster.
 
-    $ psql-cm restore --database psqlcm_test
+    $ psql-cm restore --database psqlcm_test --sql-path $HOME/sql
 
 ## Submit
 
