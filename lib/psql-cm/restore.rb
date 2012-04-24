@@ -32,11 +32,28 @@ module PSQLCM
               end
 
               sql = "SELECT content from #{schema}.#{config.cm_table} where is_base IS false ORDER BY created_at ASC;"
+              debug "sql> #{sql}"
               db(database).exec(sql).each do |row|
-                debug "restoring cm row: #{row}"
+                debug "change>\n#{row['content']}"
                 Tempfile.open('base.sql') do |temp_file|
-                  temp_file.write(row)
-                  sh "psql #{db(database).psql_args} #{database} < #{temp_file.path}"
+                  temp_file.write(row['content'])
+                  temp_file.close
+
+                  psqlrc_file = File.join(ENV['HOME'],'.psqlrc')
+                  FileUtils.touch(psqlrc_file) unless File.exists?(psqlrc_file)
+                  psqlrc = File.read(psqlrc_file)
+                  File.open(psqlrc_file,'w') do |file|
+                    file.rewind
+                    file.write "SET search_path TO #{schema}; "
+                  end
+                  begin
+                    sh "psql #{db(database).psql_args} #{database} < #{temp_file.path}"
+                  ensure
+                    File.open(psqlrc_file,'w') do |file|
+                      file.rewind
+                      file.write psqlrc
+                    end
+                  end
                 end
               end
             end

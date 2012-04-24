@@ -24,6 +24,8 @@ module PSQLCM
 
     def connect!
       @db = PG.connect(@config)
+      ObjectSpace.define_finalizer(self, proc { @db.close })
+      @db
     end
 
     def reconnect!(name = @config[:dbname])
