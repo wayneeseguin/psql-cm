@@ -1,3 +1,13 @@
+# 0.1.0 - 2012-04-24
+
+Ensure pgpass file is created if it does not exist.
+
+Ensure connections get closed.
+
+Account for setting schema when restoring.
+
+Specify schema in --table specifier within pg\_dump command.
+
 # 0.0.9 - 2012-04-23
 
 Dump now uses --no-privileges, privileges should be handled separately.
