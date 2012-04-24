@@ -84,6 +84,11 @@ module PSQLCM
       timeout = query.detect { |k| k.match /connect_timeout=/ }.to_s.sub(/.*=/,'')
       sslmode = query.detect { |k| k.match /sslmode=/ }.to_s.sub(/.*=/,'')
 
+      database = uri.path.split('/').first
+      if database && ! @config.databases.detect { |name| name == database }
+        @config.databases << database
+      end
+
       @config.connection = {
         :host => uri.host,
         :port => uri.port || 5432,
