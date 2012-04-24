@@ -4,7 +4,7 @@ module PSQLCM
 
     def initialize(options = {})
       @config = ::PSQLCM.config.connection.merge(options)
-      @config[:dbname] = options[:dbname] || 'postgres'
+      @config[:dbname] = options[:dbname] if options[:dbname]
 
       super # For delegator pattern:
       @delegated_object = db
@@ -84,15 +84,17 @@ module PSQLCM
       timeout = query.detect { |k| k.match /connect_timeout=/ }.to_s.sub(/.*=/,'')
       sslmode = query.detect { |k| k.match /sslmode=/ }.to_s.sub(/.*=/,'')
 
-      database = uri.path.split('/').first
-      if database && ! @config.databases.detect { |name| name == database }
+      database = uri.path.split('/').first.to_s
+      database = @config[:dbname] if database.empty?
+
+      unless @config.databases.detect { |name| name == database }
         @config.databases << database
       end
 
       @config.connection = {
         :host => uri.host,
         :port => uri.port || 5432,
-        :dbname => "postgres", # uri.path.sub('/',''),
+        :dbname => database,
         :user => uri.user || ENV['USER'],
         :password => uri.password,
         :connect_timeout => timeout.empty? ? 20 : timeout.to_i,
