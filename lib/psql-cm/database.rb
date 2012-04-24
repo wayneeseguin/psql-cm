@@ -37,7 +37,7 @@ module PSQLCM
 
     def pgpass # Ensure a pgpass entry exists for this connection.
       pgpass_file = File.join(ENV['HOME'], '.pgpass')
-      File.touch(pgpass_file) unless File.exists?(pgpass_file)
+      FileUtils.touch(pgpass_file) unless File.exists?(pgpass_file)
 
       pgpass_line = [ @config[:host], @config[:port], @config[:dbname],
                       @config[:user], @config[:password] ].join(':')
