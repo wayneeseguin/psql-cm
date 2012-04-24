@@ -85,7 +85,8 @@ module PSQLCM
       sslmode = query.detect { |k| k.match /sslmode=/ }.to_s.sub(/.*=/,'')
 
       database = uri.path.split('/').first.to_s
-      database = @config[:dbname] if database.empty?
+      database = @config[:dbname] || 'postgres' if database.empty?
+
 
       unless @config.databases.detect { |name| name == database }
         @config.databases << database
