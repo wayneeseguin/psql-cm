@@ -1,6 +1,6 @@
-lib = File.expand_path('../lib/', __FILE__)
+lib = File.join(File.dirname(__FILE__),'lib', __FILE__)
 
-$:.unshift lib unless $:.include?(lib)
+$LOAD_PATH.unshift lib unless $LOAD_PATH.include?(lib)
 
 def database
   @database ||= ENV["database"] || 'psqlcm_development'
