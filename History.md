@@ -1,3 +1,11 @@
+# 0.1.1 - 2012-04-27
+
+Documentation and debugging enhancements.
+
+Setup now properly uses --no-privileges
+
+Restore now ensures it uses the correct schema and loops over the change rows.
+
 # 0.1.0 - 2012-04-24
 
 Ensure pgpass file is created if it does not exist.
