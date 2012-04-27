@@ -1,6 +1,5 @@
-lib = File.expand_path('../lib/', __FILE__)
-
-$:.unshift lib unless $:.include?(lib)
+lib = File.join(File.dirname(__FILE__),'lib')
+$LOAD_PATH.unshift lib unless $LOAD_PATH.include?(lib)
 
 require 'psql-cm/version'
 
