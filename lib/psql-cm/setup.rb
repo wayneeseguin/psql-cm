@@ -8,7 +8,10 @@ module PSQLCM
           ensure_cm_table_exists(database,schema)
 
           Tempfile.open('base.sql') do |temp_file|
-            sh " pg_dump #{db(database).psql_args} --schema-only --no-owner --schema=#{schema} --file=#{temp_file.path} #{database}"
+            sh %W[ pg_dump #{db(database).psql_args}
+            --schema-only --no-owner --no-privileges
+            --schema=#{schema} --file=#{temp_file.path} #{database}
+            ]
 
             content = %x{cat #{temp_file.path}}
             name = %x{git config user.name}.strip
