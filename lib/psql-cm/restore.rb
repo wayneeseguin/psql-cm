@@ -19,48 +19,51 @@ module PSQLCM
               schema = cm_file.sub(".sql",'')
               ensure_schema_exists(database,schema)
 
-              debug "restore> #{database}:#{schema} < #{cm_file}"
-              sh "psql #{db(database).psql_args} #{database} < #{cm_file}"
 
-              ensure_cm_table_exists(database,schema)
-              Tempfile.open('base.sql') do |temp_file|
-                row = db(database).exec("SELECT content from #{schema}.#{config.cm_table}
-                                      WHERE is_base IS true ORDER BY created_at
-                                      DESC LIMIT 1;")
-                temp_file.write(row)
-                sh "psql #{db(database).psql_args} #{database} < #{temp_file.path}"
+              psqlrc_file = File.join(ENV['HOME'],'.psqlrc')
+              FileUtils.touch(psqlrc_file) unless File.exists?(psqlrc_file)
+              psqlrc = File.read(psqlrc_file)
+              File.open(psqlrc_file,'w') do |file|
+                file.rewind
+                file.write "SET search_path TO #{schema}; "
               end
+              begin
 
-              sql = "SELECT content from #{schema}.#{config.cm_table} where is_base IS false ORDER BY created_at ASC;"
-              debug "sql> #{sql}"
-              db(database).exec(sql).each do |row|
-                debug "change>\n#{row['content']}"
+                debug "restore> #{database}:#{schema} < #{cm_file}"
+                sh "psql #{db(database).psql_args} #{database} < #{cm_file}"
+
+                ensure_cm_table_exists(database,schema)
+
+                sql = "SELECT content from #{schema}.#{config.cm_table}
+                       WHERE is_base IS $1 ORDER BY created_at ASC;"
+
                 Tempfile.open('base.sql') do |temp_file|
-                  temp_file.write(row['content'])
-                  temp_file.close
+                  row = db(database).exec(sql, [true])
+                  temp_file.write(row)
+                  sh "psql #{db(database).psql_args} #{database} < #{temp_file.path}"
+                end
 
-                  psqlrc_file = File.join(ENV['HOME'],'.psqlrc')
-                  FileUtils.touch(psqlrc_file) unless File.exists?(psqlrc_file)
-                  psqlrc = File.read(psqlrc_file)
-                  File.open(psqlrc_file,'w') do |file|
-                    file.rewind
-                    file.write "SET search_path TO #{schema}; "
-                  end
-                  begin
+                debug "sql> #{sql}"
+                db(database).exec(sql,[false]).each do |row|
+                  debug "change>\n#{row['content']}"
+                  Tempfile.open('base.sql') do |temp_file|
+                    temp_file.write(row['content'])
+                    temp_file.close
                     sh "psql #{db(database).psql_args} #{database} < #{temp_file.path}"
-                  ensure
-                    File.open(psqlrc_file,'w') do |file|
-                      file.rewind
-                      file.write psqlrc
-                    end
                   end
                 end
+              ensure
+                File.open(psqlrc_file,'w') do |file|
+                  file.rewind
+                  file.write psqlrc
+                end
               end
+
             end
           end
         end
       end
     end # def restore!
 
-  end
-end
+  end # class << self
+end # module PSQLCM
