@@ -35,24 +35,29 @@ module PSQLCM
                 ensure_cm_table_exists(database,schema)
 
                 sql = "SELECT content from #{schema}.#{config.cm_table}
-                       WHERE is_base = $1 ORDER BY created_at ASC;"
-
-                Tempfile.open('base.sql') do |temp_file|
-                  debug tag, "base:sql> #{sql.sub('$1','true')}"
-                  row = db(database).exec(sql, ['true'])
-                  temp_file.write(row)
-                  sh "psql #{db(database).psql_args} #{database} < #{temp_file.path}"
+                       WHERE is_base IS true ORDER BY created_at ASC;"
+                debug tag, "base:sql> #{sql}"
+                db(database).exec(sql).each do |base_row|
+                  debug "BASE content:", base_row['content']
+                  Tempfile.open('base.sql') do |file|
+                    file.write(base_row['content'])
+                    sh "psql #{db(database).psql_args} #{database} < #{file.path}"
+                  end
                 end
 
-                debug tag, "changes:sql> #{sql.sub('$1','false')}"
-                changes = db(database).exec(sql,['false'])
+                sql = "SELECT content from #{schema}.#{config.cm_table}
+                       WHERE is_base IS false
+                       ORDER BY created_at ASC;"
+
+                debug tag, "changes:sql> #{sql}"
+                changes = db(database).exec(sql)
                 debug tag, "change:count>#{changes.cmd_tuples}"
                 changes.each do |row|
                   debug tag, "content>\n#{row['content']}"
-                  Tempfile.open('change.sql') do |temp_file|
-                    temp_file.write(row['content'])
-                    temp_file.close
-                    sh "psql #{db(database).psql_args} #{database} < #{temp_file.path}"
+                  Tempfile.open('change.sql') do |file|
+                    file.write(row['content'])
+                    file.close
+                    sh "psql #{db(database).psql_args} #{database} < #{file.path}"
                   end
                 end
               ensure
