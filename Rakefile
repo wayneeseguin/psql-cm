@@ -2,6 +2,8 @@ lib = File.join(File.dirname(__FILE__),'lib', __FILE__)
 
 $LOAD_PATH.unshift lib unless $LOAD_PATH.include?(lib)
 
+require 'psql-cm/version'
+
 def database
   @database ||= ENV["database"] || 'psqlcm_development'
 end
@@ -40,7 +42,6 @@ end
 
 desc "Build then install the psql-cm gem"
 task :install => :build do
-  require 'psql-cm/version'
   shell "gem install psql-cm-#{::PSQLCM::Version}.gem"
 end
 
@@ -106,7 +107,6 @@ namespace :submit do
 end
 
 task :release do
-  require 'psql-cm/version'
   shell "
   git tag #{::PSQLCM::Version};
   git push origin --tags;
