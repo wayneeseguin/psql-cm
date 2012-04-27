@@ -35,16 +35,16 @@ module PSQLCM
                 ensure_cm_table_exists(database,schema)
 
                 sql = "SELECT content from #{schema}.#{config.cm_table}
-                       WHERE is_base IS $1 ORDER BY created_at ASC;"
+                       WHERE is_base = $1 ORDER BY created_at ASC;"
 
                 Tempfile.open('base.sql') do |temp_file|
-                  row = db(database).exec(sql, [true])
+                  row = db(database).exec(sql, ['true'])
                   temp_file.write(row)
                   sh "psql #{db(database).psql_args} #{database} < #{temp_file.path}"
                 end
 
                 debug "sql> #{sql}"
-                db(database).exec(sql,[false]).each do |row|
+                db(database).exec(sql,['false']).each do |row|
                   debug "change>\n#{row['content']}"
                   Tempfile.open('base.sql') do |temp_file|
                     temp_file.write(row['content'])
