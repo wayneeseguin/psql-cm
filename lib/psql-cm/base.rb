@@ -1,15 +1,15 @@
 module PSQLCM
   class << self
-    def verbose(message)
-      $stdout.puts message if (config.verbose || config.debug)
+    def verbose(*message)
+      $stdout.puts message.join(' ') if (config.verbose || config.debug)
     end
 
-    def debug(message)
-      $stdout.puts message if config.debug
+    def debug(*message)
+      $stdout.puts message.join(' ') if config.debug
     end
 
-    def halt!(message)
-      $stderr.puts message
+    def halt!(*message)
+      $stderr.puts message.join(' ')
       exit 1
     end
 

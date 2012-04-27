@@ -28,7 +28,8 @@ module PSQLCM
               end
 
               begin
-                debug "restore> #{database}:#{schema} < #{cm_file}"
+                tag = "restore:#{database}:#{schema}>"
+                debug tag, cm_file
                 sh "psql #{db(database).psql_args} #{database} < #{cm_file}"
 
                 ensure_cm_table_exists(database,schema)
@@ -37,17 +38,17 @@ module PSQLCM
                        WHERE is_base = $1 ORDER BY created_at ASC;"
 
                 Tempfile.open('base.sql') do |temp_file|
-                  debug "restore:base:sql> #{sql.sub('$1','true')}"
+                  debug tag, "base:sql> #{sql.sub('$1','true')}"
                   row = db(database).exec(sql, ['true'])
                   temp_file.write(row)
                   sh "psql #{db(database).psql_args} #{database} < #{temp_file.path}"
                 end
 
-                debug "restore:changes:sql> #{sql.sub('$1','false')}"
+                debug tag, "changes:sql> #{sql.sub('$1','false')}"
                 changes = db(database).exec(sql,['false'])
-                debug "restore:change:count>#{changes.cmd_tuples}"
+                debug tag, "change:count>#{changes.cmd_tuples}"
                 changes.each do |row|
-                  debug "restore:change:content>\n#{row['content']}"
+                  debug tag, "content>\n#{row['content']}"
                   Tempfile.open('change.sql') do |temp_file|
                     temp_file.write(row['content'])
                     temp_file.close
@@ -60,7 +61,6 @@ module PSQLCM
                   file.write psqlrc
                 end
               end
-
             end
           end
         end
