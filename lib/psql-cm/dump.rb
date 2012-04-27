@@ -15,8 +15,9 @@ module PSQLCM
             cm_file = File.join(sql_path,database,"#{schema}.sql")
 
             sh %W[ pg_dump #{db(database).psql_args} --no-privileges --no-owner
-                 --schema=#{schema} --file=#{cm_file} --table=#{schema}.#{config.cm_table}
-                 #{database} ].join(' ')
+                 --schema=#{schema} --file=#{cm_file}
+                 --table=#{schema}.#{config.cm_table} #{database}
+            ].join(' ')
           end
         end
 

@@ -11,7 +11,7 @@ module PSQLCM
             sh %W[ pg_dump #{db(database).psql_args}
             --schema-only --no-owner --no-privileges
             --schema=#{schema} --file=#{temp_file.path} #{database}
-            ]
+            ].join(' ')
 
             content = %x{cat #{temp_file.path}}
             name = %x{git config user.name}.strip
