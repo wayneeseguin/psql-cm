@@ -44,7 +44,7 @@ psql-cm is not intended on being a solution for data backup.
 For backup of data instead use the
 [pg\_dump](http://www.postgresql.org/docs/current/static/app-pgdump.html)
 command line utility for backing up data in addition to a
-[repliaction](http://www.postgresql.org/docs/current/static/different-replication-solutions.html)
+[replication](http://www.postgresql.org/docs/current/static/different-replication-solutions.html)
 technique tailored to your needs.
 
 ## The process
