@@ -1,3 +1,7 @@
+# 0.2.0 - 2012-05-17
+
+Ownership and privileges are now recorded.
+
 # 0.1.1 - 2012-04-27
 
 Documentation and debugging enhancements.
