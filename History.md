@@ -1,3 +1,8 @@
+# 0.2.1 - 2012-05-22
+
+Added more debug output.
+Explicitely exclude pg\_psql\_cm from setup dump.
+
 # 0.2.0 - 2012-05-17
 
 Ownership and privileges are now recorded.
