@@ -22,10 +22,10 @@ module PSQLCM
               psqlrc_file = File.join(ENV['HOME'],'.psqlrc')
               FileUtils.touch(psqlrc_file) unless File.exists?(psqlrc_file)
               psqlrc = File.read(psqlrc_file)
-              File.open(psqlrc_file,'w') do |file|
-                file.rewind
-                file.write "SET search_path TO #{schema}; "
-              end
+
+              file = File.open(psqlrc_file,'w')
+              file.write "SET search_path TO #{schema}; "
+              file.close
 
               begin
                 tag = "restore:#{database}:#{schema}>"
@@ -39,10 +39,10 @@ module PSQLCM
                 debug tag, "base:sql> #{sql}"
                 db(database).exec(sql).each do |base_row|
                   debug "BASE content:", base_row['content']
-                  Tempfile.open('base.sql') do |file|
-                    file.write(base_row['content'])
-                    sh "psql #{db(database).psql_args} #{database} < #{file.path}"
-                  end
+                  tempfile = Tempfile.open('base.sql')
+                  tempfile.write(base_row['content'])
+                  sh "psql #{db(database).psql_args} #{database} < #{tempfile.path}"
+                  tempfile.close
                 end
 
                 sql = "SELECT content from #{schema}.#{config.cm_table}
@@ -54,17 +54,15 @@ module PSQLCM
                 debug tag, "change:count>#{changes.cmd_tuples}"
                 changes.each do |row|
                   debug tag, "content>\n#{row['content']}"
-                  Tempfile.open('change.sql') do |file|
-                    file.write(row['content'])
-                    file.close
-                    sh "psql #{db(database).psql_args} #{database} < #{file.path}"
-                  end
+                  tempfile = Tempfile.open('change.sql')
+                  tempfile.write(row['content'])
+                  sh "psql #{db(database).psql_args} #{database} < #{tempfile.path}"
+                  tempfile.close
                 end
               ensure
-                File.open(psqlrc_file,'w') do |file|
-                  file.rewind
-                  file.write psqlrc
-                end
+                file = File.open(psqlrc_file,'w')
+                file.write psqlrc
+                file.close
               end
             end
           end

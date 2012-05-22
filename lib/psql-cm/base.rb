@@ -76,7 +76,8 @@ module PSQLCM
 
     def sh(command)
       debug "$ #{command}"
-      %x[#{command} 2>&1 | awk '! /NOTICE/']
+      output = %x[#{command} 2>&1 | awk '! /NOTICE/']
+      debug output
     end
 
     def uri

@@ -9,7 +9,7 @@ module PSQLCM
 
           Tempfile.open('base.sql') do |temp_file|
             sh %W[ pg_dump #{db(database).psql_args}
-            --schema-only --no-owner --no-privileges
+            --schema-only --no-owner --no-privileges --exclude-table=pg_psql_cm
             --schema=#{schema} --file=#{temp_file.path} #{database}
             ].join(' ')
 
