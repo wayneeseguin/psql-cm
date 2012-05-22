@@ -1,3 +1,7 @@
+# 0.2.2 - 2012-05-22
+
+Include permissions and owners on database objects.
+
 # 0.2.1 - 2012-05-22
 
 Added more debug output.
